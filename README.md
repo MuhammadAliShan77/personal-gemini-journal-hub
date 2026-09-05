@@ -1,4 +1,21 @@
-# ReflectAI — Authenticated Reflection & Journaling Assistant
+<div align="center">
+
+# 🪞 ReflectAI
+
+**Authenticated Reflection & Journaling Assistant — Full-Stack AI Workspace**
+
+![React](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=white)
+![Express](https://img.shields.io/badge/Backend-Express_%2B_Node.js-000000?logo=express&logoColor=white)
+![Firebase](https://img.shields.io/badge/Auth-Firebase_Google_Sign--In-FFCA28?logo=firebase&logoColor=black)
+![Firestore](https://img.shields.io/badge/Database-Cloud_Firestore-FF6F00?logo=firebase&logoColor=white)
+![Gemini](https://img.shields.io/badge/AI-Gemini_3.6_Flash-4285F4?logo=google&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen)
+
+[Architecture](#architecture-overview) · [Prerequisites](#1-prerequisites--gcp-configuration) · [Secrets](#2-secret-management-setup) · [Firestore Rules](#3-database-security-configuration-cloud-firestore) · [Local Dev](#4-local-development) · [Deploy](#5-production-build--cloud-run-deployment) · [Tests](#6-end-to-end-functional-test-walkthrough)
+
+</div>
+
+---
 
 ReflectAI is a full-stack, user-authenticated journaling, emotional intelligence, and multi-turn reflection workspace built with **React**, **Express**, **Firebase Authentication (Google Sign-In)**, **Cloud Firestore**, and **Google Gemini 3.6 Flash**.
 
@@ -13,7 +30,7 @@ All journal entries and conversational reflections are strictly isolated to each
 | **Authentication** | Firebase Auth | Federated Google Sign-In; no raw passwords stored. |
 | **Database** | Cloud Firestore | Owner-bound isolation at `/users/{userId}/journalEntries/{id}` and `/users/{userId}/interactions/{id}`. |
 | **Backend Service** | Express + Node.js | Serves client SPA and proxies Gemini requests; zero client secret exposure. |
-| **AI Intelligence** | Gemini 3.6 Flash API | Multi-turn reflections & AI Mood/Productivity Hub with automated fallback ladder (`gemini-3.6-flash` &rarr; `gemini-3.1-flash-lite` &rarr; `gemini-flash-latest` &rarr; `gemini-3.7-flash`). |
+| **AI Intelligence** | Gemini 3.6 Flash API | Multi-turn reflections & AI Mood/Productivity Hub with automated fallback ladder (`gemini-3.6-flash` → `gemini-3.1-flash-lite` → `gemini-flash-latest` → `gemini-3.7-flash`). |
 | **Export & Portability** | Custom Export Engine | Client-side export to Markdown (`.md`), JSON backup archive (`.json`), and formatted PDF/Print. |
 | **Secret Management** | Google Secret Manager | Secure retrieval of `GEMINI_API_KEY` without source code hardcoding. |
 
@@ -166,3 +183,20 @@ Below are the structured test cases covering every user interaction:
 | **TC-15: Dark / Light Mode Toggle** | Click Sun/Moon icon in top navbar | App seamlessly toggles between dark luxury theme and crisp light theme; preference persists in `localStorage`. |
 | **TC-16: Collapsible Desktop Sidebar** | Click panel collapse button on desktop sidebar | Sidebar shrinks into a compact icon rail, maximizing workspace focus area; clicking again restores full width. |
 | **TC-17: Sign Out** | Click Sign Out icon in top navbar | Auth session terminates; UI reverts safely to Landing Page with cleared memory. |
+
+---
+
+## 👨‍💻 Author & Acknowledgments
+
+- **Developer**: **Muhammad Ali Shan** (Computer Science Student, UET Lahore)
+- **Context**: Developed strictly through official **Google GenAI Codelabs** and cloud infrastructure training modules.
+
+---
+
+<div align="center">
+
+Built with ❤️ for the **Google Cloud Run Ideathon Challenge**
+<br/>
+AI Excellence | Official Google GenAI Codelabs
+
+</div>
