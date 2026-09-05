@@ -1,0 +1,34 @@
+{
+  "entities": {
+    "UserProfile": {
+      "path": "users/{userId}",
+      "description": "Authenticated user profile document",
+      "fields": {
+        "uid": { "type": "string", "description": "User unique ID" },
+        "email": { "type": "string", "description": "User email address" },
+        "displayName": { "type": "string", "description": "User display name" },
+        "photoURL": { "type": "string", "description": "User avatar URL" },
+        "lastActive": { "type": "string", "description": "ISO timestamp of last activity" }
+      }
+    },
+    "JournalEntry": {
+      "path": "users/{userId}/journalEntries/{entryId}",
+      "description": "User-isolated journal entries, reflections, and AI intelligence analysis",
+      "fields": {
+        "id": { "type": "string", "description": "Entry document identifier" },
+        "userId": { "type": "string", "description": "Owner user ID" },
+        "title": { "type": "string", "description": "Reflection title" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of creation" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp of last update" },
+        "summary": { "type": "string", "description": "Optional AI summary" },
+        "tags": { "type": "array", "description": "Optional category tags" },
+        "messages": { "type": "array", "description": "Array of JournalMessage turns" },
+        "moodScore": { "type": "number", "description": "AI-derived mood score (0-100)" },
+        "focusScore": { "type": "number", "description": "AI-derived focus score (0-100)" },
+        "sentiment": { "type": "string", "description": "AI-derived emotional sentiment" },
+        "emotionalKeywords": { "type": "array", "description": "Detected emotional tags" },
+        "productivityTips": { "type": "array", "description": "Actionable productivity insights" }
+      }
+    }
+  }
+}

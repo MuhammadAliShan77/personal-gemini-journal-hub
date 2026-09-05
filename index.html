@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      // Safeguard against 'Cannot set property fetch of #<Window> which has only a getter'
+      (function () {
+        try {
+          var rawFetch = window.fetch;
+          var currentFetch = function () {
+            return (rawFetch || fetch).apply(window, arguments);
+          };
+          Object.defineProperty(window, 'fetch', {
+            get: function () {
+              return currentFetch;
+            },
+            set: function (fn) {
+              currentFetch = fn;
+            },
+            configurable: true,
+            enumerable: true,
+          });
+        } catch (e) {
+          try {
+            var proto = Object.getPrototypeOf(window) || (typeof Window !== 'undefined' && Window.prototype);
+            if (proto) {
+              var pRaw = window.fetch;
+              var pCur = function () {
+                return (pRaw || fetch).apply(window, arguments);
+              };
+              Object.defineProperty(proto, 'fetch', {
+                get: function () {
+                  return pCur;
+                },
+                set: function (fn) {
+                  pCur = fn;
+                },
+                configurable: true,
+                enumerable: true,
+              });
+            }
+          } catch (err) {
+            console.warn('[ReflectAI] Fetch property handler warning:', err);
+          }
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReflectAI</title>
+    <meta name="description" content="A private, authenticated journaling and multi-turn reflection workspace with Firestore vault and resilient Gemini fallback ladder." />
+    <meta property="og:title" content="ReflectAI" />
+    <meta property="og:description" content="A private, authenticated journaling and multi-turn reflection workspace with Firestore vault and resilient Gemini fallback ladder." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
