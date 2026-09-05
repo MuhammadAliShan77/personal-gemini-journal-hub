@@ -276,6 +276,7 @@ export default function App() {
             theme={theme}
             cachedReport={intelligenceReport}
             onReportGenerated={setIntelligenceReport}
+            onOpenExportModal={() => setIsExportModalOpen(true)}
             showToast={showToast}
           />
         )}

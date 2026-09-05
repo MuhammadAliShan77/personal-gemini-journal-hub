@@ -28,28 +28,79 @@ import {
   Legend,
 } from 'recharts';
 import type { JournalEntry, IntelligenceReport, ThemeMode } from '../types';
+import type { User } from 'firebase/auth';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface IntelligenceHubProps {
   entries: JournalEntry[];
-  currentReport: IntelligenceReport | null;
-  onGenerateReport: () => Promise<void>;
-  isLoading: boolean;
-  onOpenExportModal: () => void;
+  user?: User | null;
+  currentReport?: IntelligenceReport | null;
+  cachedReport?: IntelligenceReport | null;
+  onGenerateReport?: () => Promise<void>;
+  onReportGenerated?: (report: IntelligenceReport) => void;
+  isLoading?: boolean;
+  onOpenExportModal?: () => void;
   theme: ThemeMode;
   showToast: (msg: string) => void;
 }
 
 export const IntelligenceHub: React.FC<IntelligenceHubProps> = ({
   entries,
-  currentReport,
-  onGenerateReport,
-  isLoading,
+  user,
+  currentReport: propCurrentReport,
+  cachedReport,
+  onGenerateReport: propOnGenerateReport,
+  onReportGenerated,
+  isLoading: propIsLoading,
   onOpenExportModal,
   theme,
   showToast,
 }) => {
+  const [internalReport, setInternalReport] = useState<IntelligenceReport | null>(cachedReport || null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [copiedSummary, setCopiedSummary] = useState(false);
   const [completedHabits, setCompletedHabits] = useState<Record<number, boolean>>({});
+
+  const currentReport = propCurrentReport || internalReport || cachedReport || null;
+  const isLoading = propIsLoading !== undefined ? propIsLoading : isGenerating;
+
+  const handleGenerateReport = async () => {
+    if (propOnGenerateReport) {
+      await propOnGenerateReport();
+      return;
+    }
+    if (entries.length === 0) {
+      showToast('Please create at least one reflection entry first.');
+      return;
+    }
+    try {
+      setIsGenerating(true);
+      const token = user ? await user.getIdToken() : '';
+      const res = await fetch('/api/gemini/insights', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ entries }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to synthesize intelligence report');
+      }
+      const data: IntelligenceReport = await res.json();
+      setInternalReport(data);
+      if (onReportGenerated) {
+        onReportGenerated(data);
+      }
+      showToast('Intelligence analysis updated successfully!');
+    } catch (err: any) {
+      console.error('Failed to generate intelligence report:', err);
+      showToast(err?.message || 'Error running intelligence analysis');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleCopySummary = () => {
     if (!currentReport?.weeklySynthesis) return;
@@ -109,22 +160,24 @@ export const IntelligenceHub: React.FC<IntelligenceHubProps> = ({
           </div>
 
           <div className="flex items-center gap-2.5 shrink-0">
-            <button
-              id="export-intelligence-btn"
-              onClick={onOpenExportModal}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition shadow-xs cursor-pointer ${
-                isDark
-                  ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
-                  : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700'
-              }`}
-            >
-              <Download className="w-4 h-4 text-indigo-500" />
-              <span>Export Dossier</span>
-            </button>
+            {onOpenExportModal && (
+              <button
+                id="export-intelligence-btn"
+                onClick={onOpenExportModal}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition shadow-xs cursor-pointer ${
+                  isDark
+                    ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
+                    : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700'
+                }`}
+              >
+                <Download className="w-4 h-4 text-indigo-500" />
+                <span>Export Dossier</span>
+              </button>
+            )}
 
             <button
               id="refresh-intelligence-btn"
-              onClick={onGenerateReport}
+              onClick={handleGenerateReport}
               disabled={isLoading || entries.length === 0}
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white transition shadow-sm cursor-pointer"
             >
@@ -393,13 +446,9 @@ export const IntelligenceHub: React.FC<IntelligenceHubProps> = ({
             </button>
           </div>
 
-          <div className="prose prose-sm dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 leading-relaxed text-xs sm:text-sm">
+          <div className="max-w-none text-slate-700 dark:text-slate-300 leading-relaxed text-xs sm:text-sm">
             {currentReport?.weeklySynthesis ? (
-              currentReport.weeklySynthesis.split('\n\n').map((para, i) => (
-                <p key={i} className="mb-2.5">
-                  {para}
-                </p>
-              ))
+              <MarkdownRenderer content={currentReport.weeklySynthesis} />
             ) : (
               <p className="italic text-slate-400 dark:text-slate-500">
                 Click &quot;Analyze with Gemini&quot; above to generate a deep cognitive synthesis and psychological profile from your reflections.

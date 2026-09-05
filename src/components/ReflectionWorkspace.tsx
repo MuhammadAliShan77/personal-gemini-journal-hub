@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import type { JournalEntry, JournalMessage, ReflectionMode, ThemeMode } from '../types';
 import type { User } from 'firebase/auth';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface ReflectionWorkspaceProps {
   user: User;
@@ -411,7 +412,7 @@ export const ReflectionWorkspace: React.FC<ReflectionWorkspaceProps> = ({
                           })}
                         </span>
                       </div>
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                      <MarkdownRenderer content={msg.content} isUser={true} />
                     </div>
                   ) : (
                     // Gemini Message styling
@@ -458,7 +459,7 @@ export const ReflectionWorkspace: React.FC<ReflectionWorkspaceProps> = ({
                           </div>
                         </div>
 
-                        <div className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</div>
+                        <MarkdownRenderer content={msg.content} />
                       </div>
                     </div>
                   )}
